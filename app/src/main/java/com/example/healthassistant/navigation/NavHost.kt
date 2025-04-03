@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.healthassistant.consent.ui.ConsentScreen
+import com.example.healthassistant.fileupload.ui.FileUploadScreen
 import com.example.healthassistant.login.LoginScreen
 
 sealed class Screen(val route: String) {
@@ -40,12 +41,12 @@ fun AppNavHost(
         ) { backStackEntry ->
             val consentId = backStackEntry.arguments?.getString("consentId") ?: ""
             ConsentScreen(consentId, {
-            //TODO()
+                navController.navigate(Screen.Upload.route)
             })
         }
 
         composable("upload") {
-            //TODO: FileUploadScreen()
+            FileUploadScreen()
         }
     }
 }

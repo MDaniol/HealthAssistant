@@ -13,7 +13,7 @@ interface ConsentQueries {
     fun clearAll()
 }
 
-// MockConsentDatabase.kt (in-memory mock for development)
+// MockConsentDatabase.kt (in-memory mock for development), for real app: SQLDelight + SQLCipher
 class MockConsentDatabase : ConsentDatabase {
     private val inMemoryConsents = mutableListOf<Consent>()
 

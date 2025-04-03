@@ -26,8 +26,14 @@ import kotlinx.serialization.json.JsonArray
 // ConsentRepository.kt
 interface ConsentRepository {
     suspend fun getAvailableConsents(token: String): List<Consent>
-    suspend fun grantConsent(consentId: String, deviceId: String): String
+    suspend fun grantConsent(consentId: String, deviceId: String): GrantConsentResult
 }
+
+enum class GrantConsentResult {
+    SUCCESS,
+    FAILURE
+}
+
 
 class ConsentRepositoryImpl @Inject constructor(
     private val client: HttpClient
@@ -51,7 +57,8 @@ class ConsentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun grantConsent(consentId: String, deviceId: String): String {
+    override suspend fun grantConsent(consentId: String, deviceId: String): GrantConsentResult
+    {
         return try {
             val response = client.submitForm(
                 url = "http://10.0.2.2:8000/api/consents/accept",
@@ -67,12 +74,12 @@ class ConsentRepositoryImpl @Inject constructor(
             }
 
             if (response.status.value in 200..299) {
-                response.bodyAsText()
+                GrantConsentResult.SUCCESS
             } else {
-                "Failed with status: ${response.status}"
+                GrantConsentResult.FAILURE
             }
         } catch (e: Exception) {
-            "Error granting consent: ${e.message}"
+            GrantConsentResult.FAILURE
         }
     }
 }
