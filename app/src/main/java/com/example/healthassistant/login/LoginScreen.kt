@@ -11,11 +11,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -23,13 +23,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
+    onConsentRequired: (String) -> Unit,
+    onReadyForUpload: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
 
-    val loginStatus = viewModel.loginStatus.collectAsState()
+    val showError = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -39,7 +40,10 @@ fun LoginScreen(
     ) {
         TextField(
             value = username.value,
-            onValueChange = { username.value = it },
+            onValueChange = {
+                username.value = it
+                showError.value = false
+            },
             label = { Text("Username") }
         )
 
@@ -47,7 +51,10 @@ fun LoginScreen(
 
         TextField(
             value = password.value,
-            onValueChange = { password.value = it },
+            onValueChange = {
+                password.value = it
+                showError.value = false
+            },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
@@ -55,23 +62,31 @@ fun LoginScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        when (loginStatus.value) {
-            LoginStatus.Loading -> CircularProgressIndicator()
-            LoginStatus.Failure -> Text("Login failed. Check your credentials.", color = androidx.compose.ui.graphics.Color.Red)
-            else -> Unit
+        if (showError.value) {
+            Text("Logowanie nie powiodło się. Sprawdź dane.", color = Color.Red)
+            Spacer(Modifier.height(8.dp))
         }
 
-        Spacer(Modifier.height(16.dp))
-
         Button(
-            onClick = { viewModel.login(username.value, password.value) },
-            enabled = loginStatus.value != LoginStatus.Loading
+            onClick = {
+                viewModel.login(
+                    username = username.value,
+                    password = password.value,
+                    onConsentRequired = { consentId ->
+                        onConsentRequired(consentId)
+                    },
+                    onUploadReady = onReadyForUpload,
+                    onError = { showError.value = true }
+                )
+            },
+            enabled = !viewModel.isLoading
         ) {
             Text("Login")
         }
 
-        if (loginStatus.value == LoginStatus.Success) {
-            onLoginSuccess()
+        if (viewModel.isLoading) {
+            Spacer(Modifier.height(8.dp))
+            CircularProgressIndicator()
         }
     }
 }

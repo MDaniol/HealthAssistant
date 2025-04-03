@@ -1,5 +1,8 @@
 package com.example.healthassistant.login
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthassistant.core.repositories.LoginRepository
@@ -19,23 +22,27 @@ enum class LoginStatus {
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginRepository: LoginRepository,
-    private val tokenStore: TokenStore
+    private val loginUseCase: LoginUseCase
 ) : ViewModel() {
 
-    private val _loginStatus = MutableStateFlow(LoginStatus.Idle)
-    val loginStatus: StateFlow<LoginStatus> = _loginStatus
+    var isLoading by mutableStateOf(false)
+        private set
 
-    fun login(username: String, password: String) {
+    fun login(
+        username: String,
+        password: String,
+        onConsentRequired: (String) -> Unit,
+        onUploadReady: () -> Unit,
+        onError: () -> Unit
+    ) {
         viewModelScope.launch {
-            _loginStatus.value = LoginStatus.Loading
-            val token = loginRepository.login(username, password)
-            if (!token.isNullOrBlank()) {
-                tokenStore.saveToken(token)
-                _loginStatus.value = LoginStatus.Success
-            } else {
-                _loginStatus.value = LoginStatus.Failure
+            isLoading = true
+            when (val result = loginUseCase.loginAndDecide(username, password)) {
+                is LoginResult.ConsentRequired -> onConsentRequired(result.consentId)
+                is LoginResult.ReadyToUpload -> onUploadReady()
+                is LoginResult.Error -> onError()
             }
+            isLoading = false
         }
     }
 }
