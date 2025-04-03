@@ -8,7 +8,7 @@ interface ConsentDatabase {
 
 
 interface ConsentQueries {
-    fun insertConsent(consentId: String, title: String, description: String, studyId: String, version: String)
+    fun insertConsent(consentId: String, title: String, description: String, document: String, studyId: String, version: String)
     fun selectAll(): List<Consent>
     fun clearAll()
 }
@@ -22,10 +22,11 @@ class MockConsentDatabase : ConsentDatabase {
             consentId: String,
             title: String,
             description: String,
+            document: String,
             studyId: String,
             version: String
         ) {
-            inMemoryConsents.add(Consent(consentId, title, description, studyId, version))
+            inMemoryConsents.add(Consent(consentId, title, description, document, studyId, version))
         }
 
         override fun selectAll(): List<Consent> = inMemoryConsents.toList()

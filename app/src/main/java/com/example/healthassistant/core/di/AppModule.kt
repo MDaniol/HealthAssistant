@@ -27,7 +27,7 @@ object AppModule {
 
     @Provides
     fun provideHttpClient(): HttpClient {
-        return KtorClientProvider.getClient(null) // no auth needed
+        return KtorClientProvider.getClient() // no auth needed
     }
 
     @Provides
