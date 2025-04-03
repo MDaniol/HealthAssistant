@@ -15,37 +15,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.healthassistant.login.LoginScreen
-import com.example.healthassistant.login.LoginViewModel
-import com.example.healthassistant.ui.theme.HealthAssistantTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             Box(
-                modifier = Modifier.fillMaxSize(), // zajmuje cały ekran
-                contentAlignment = Alignment.Center // wyśrodkowuje swoją zawartość
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                LoginScreen({ Log.d("MAIN", "Login Successful") }, viewModel = LoginViewModel())
+                LoginScreen({ Log.d("MAIN", "Login Successful") })
             }
-
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    HealthAssistantTheme {
-        Greeting("Android")
     }
 }

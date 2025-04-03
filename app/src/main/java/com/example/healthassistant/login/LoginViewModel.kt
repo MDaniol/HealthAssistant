@@ -1,47 +1,41 @@
 package com.example.healthassistant.login
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.healthassistant.core.KtorClientProvider
-import com.example.healthassistant.core.SecureStorage
-import io.ktor.client.request.forms.submitForm
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.Parameters
-import io.ktor.http.isSuccess
+import com.example.healthassistant.core.repositories.LoginRepository
+import com.example.healthassistant.core.stores.TokenStore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import javax.inject.Inject
 
-class LoginViewModel : ViewModel() {
-    fun login(username: String, password: String, context: Context, onResult: (Boolean) -> Unit) {
+enum class LoginStatus {
+    Idle,
+    Loading,
+    Success,
+    Failure
+}
+
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val loginRepository: LoginRepository,
+    private val tokenStore: TokenStore
+) : ViewModel() {
+
+    private val _loginStatus = MutableStateFlow(LoginStatus.Idle)
+    val loginStatus: StateFlow<LoginStatus> = _loginStatus
+
+    fun login(username: String, password: String) {
         viewModelScope.launch {
-            try {
-                val client = KtorClientProvider.getClient(null) // no token yet
-
-                val response: HttpResponse = client.submitForm(
-                    url = "http://10.0.2.2:8000/api/auth/token",
-                    formParameters = Parameters.build {
-                        append("username", username)
-                        append("password", password)
-                    }
-                )
-
-                if (response.status.isSuccess()) {
-                    val body = Json.decodeFromString<JsonObject>(response.bodyAsText())
-                    val token = body["access_token"]?.jsonPrimitive?.content
-                    if (!token.isNullOrBlank()) {
-                        SecureStorage.saveToken(context, token)
-                        onResult(true)
-                        return@launch
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            _loginStatus.value = LoginStatus.Loading
+            val token = loginRepository.login(username, password)
+            if (!token.isNullOrBlank()) {
+                tokenStore.saveToken(token)
+                _loginStatus.value = LoginStatus.Success
+            } else {
+                _loginStatus.value = LoginStatus.Failure
             }
-            onResult(false)
         }
     }
 }
