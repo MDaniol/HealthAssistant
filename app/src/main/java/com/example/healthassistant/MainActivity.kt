@@ -27,7 +27,10 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                LoginScreen({ Log.d("MAIN", "Login Successful") })
+                LoginScreen(
+                    onConsentRequired = { Log.d("MainActivity", "consent id: $it") },
+                    onReadyForUpload = { TODO() }
+                )
             }
         }
     }
