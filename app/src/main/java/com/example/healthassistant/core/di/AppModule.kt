@@ -27,8 +27,9 @@ import javax.inject.Singleton
 object AppModule {
 
     @Provides
-    fun provideHttpClient(): HttpClient {
-        return KtorClientProvider.getClient() // no auth needed
+    @Singleton
+    fun provideKtorClient(tokenStore: TokenStore): HttpClient {
+        return KtorClientProvider.getClient(tokenStore) // Inject the TokenStore
     }
 
     @Provides

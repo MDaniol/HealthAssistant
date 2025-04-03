@@ -9,8 +9,15 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
+import com.example.healthassistant.core.stores.TokenStore
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
+import io.ktor.http.encodedPath
+
 object KtorClientProvider {
-    fun getClient(token: String? = null): HttpClient {
+
+    fun getClient(tokenStore: TokenStore): HttpClient {
         return HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
@@ -22,9 +29,18 @@ object KtorClientProvider {
             install(Logging) {
                 level = LogLevel.ALL
             }
-            defaultRequest {
-                if (!token.isNullOrBlank()) {
-                    headers.append("Authorization", "Bearer $token")
+
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        val token = tokenStore.getToken() ?: ""
+                        BearerTokens(token, "")
+                    }
+                    sendWithoutRequest { request ->
+                        // Do NOT send token when requesting /auth/token
+                        val path = request.url.encodedPath
+                        !path.contains("/api/auth/token")
+                    }
                 }
             }
         }

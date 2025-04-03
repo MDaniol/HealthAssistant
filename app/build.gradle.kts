@@ -70,7 +70,7 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.client.logging)
-
+    implementation("io.ktor:ktor-client-auth:3.1.2")
 
     //Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")

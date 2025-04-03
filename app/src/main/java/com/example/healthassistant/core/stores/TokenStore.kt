@@ -19,7 +19,6 @@ class TokenStoreImpl @Inject constructor(
     }
 
     override suspend fun getToken(): String? {
-        return SecureStorage.getToken(context)
+        return SecureStorage.getToken(context) // This is already async
     }
-
 }

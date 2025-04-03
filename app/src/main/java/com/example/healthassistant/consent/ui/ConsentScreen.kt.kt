@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 @Composable
@@ -31,14 +32,11 @@ fun ConsentScreen(
     onConsentAccepted: () -> Unit,
     consentViewModel: ConsentScreenViewModel = hiltViewModel()
 ) {
-    // Ładowanie zgody przy pierwszym wejściu na ekran
     LaunchedEffect(consentId) {
         consentViewModel.loadConsent(consentId)
     }
 
-    // Pobieranie stanu zgody z ViewModel
     val consent = consentViewModel.consent.collectAsState().value
-
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -81,7 +79,7 @@ fun ConsentScreen(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Button(
-                        onClick = onConsentAccepted,
+                        onClick = { consentViewModel.acceptConsent() },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("I Agree and Continue")
