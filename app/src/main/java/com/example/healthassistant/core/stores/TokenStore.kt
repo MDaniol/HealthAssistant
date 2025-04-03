@@ -7,6 +7,8 @@ import javax.inject.Inject
 
 interface TokenStore {
     suspend fun saveToken(token: String)
+    suspend fun getToken(): String?
+
 }
 
 class TokenStoreImpl @Inject constructor(
@@ -15,4 +17,9 @@ class TokenStoreImpl @Inject constructor(
     override suspend fun saveToken(token: String) {
         SecureStorage.saveToken(context, token)
     }
+
+    override suspend fun getToken(): String? {
+        return SecureStorage.getToken(context)
+    }
+
 }

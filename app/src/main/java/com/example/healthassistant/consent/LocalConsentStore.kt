@@ -19,6 +19,7 @@ class LocalConsentStoreImpl @Inject constructor(
                 it.consentId,
                 it.title,
                 it.description,
+                it.document,
                 it.studyId,
                 it.version
             )
@@ -31,6 +32,7 @@ class LocalConsentStoreImpl @Inject constructor(
                 it.consentId,
                 it.title,
                 it.description,
+                it.document,
                 it.studyId,
                 it.version
             )

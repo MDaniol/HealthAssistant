@@ -2,7 +2,7 @@ package com.example.healthassistant.consent
 
 import com.example.healthassistant.consent.model.AvailableConsents
 import com.example.healthassistant.consent.model.Consent
-import com.example.healthassistant.core.KtorClientProvider
+import com.example.healthassistant.core.network.KtorClientProvider
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -48,4 +48,15 @@ class ConsentRepositoryImpl @Inject constructor(
             emptyList()
         }
     }
+
+    suspend fun grantConsent(userId: String, consentId: String, deviceId: String): Result<String> {
+        return try {
+            val response = consentApi.grantConsent(userId, consentId, deviceId)
+            Result.success("Consent granted successfully: $response")
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
 }

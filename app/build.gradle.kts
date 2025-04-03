@@ -59,6 +59,7 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.viewmodel.compose)
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 
     implementation(libs.androidx.security.crypto)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")

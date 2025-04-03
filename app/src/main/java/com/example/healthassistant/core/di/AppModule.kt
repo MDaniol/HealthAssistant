@@ -4,10 +4,11 @@ import android.content.Context
 import com.example.healthassistant.consent.ConsentDatabase
 import com.example.healthassistant.consent.ConsentRepository
 import com.example.healthassistant.consent.ConsentRepositoryImpl
+import com.example.healthassistant.consent.GetConsentUseCase
 import com.example.healthassistant.consent.LocalConsentStore
 import com.example.healthassistant.consent.LocalConsentStoreImpl
 import com.example.healthassistant.consent.MockConsentDatabase
-import com.example.healthassistant.core.KtorClientProvider
+import com.example.healthassistant.core.network.KtorClientProvider
 import com.example.healthassistant.core.repositories.LoginRepository
 import com.example.healthassistant.core.repositories.LoginRepositoryImpl
 import com.example.healthassistant.core.stores.TokenStore
@@ -50,17 +51,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideLocalConsentStore(
-        database: ConsentDatabase
-    ): LocalConsentStore {
+    fun provideLocalConsentStore(database: ConsentDatabase): LocalConsentStore {
         return LocalConsentStoreImpl(database)
     }
 
     @Provides
     @Singleton
-    fun provideConsentRepository(
-        client: HttpClient
-    ): ConsentRepository {
+    fun provideConsentRepository(client: HttpClient): ConsentRepository {
         return ConsentRepositoryImpl(client)
     }
 
@@ -77,6 +74,12 @@ object AppModule {
             tokenStore = tokenStore,
             localConsentStore = localConsentStore
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetConsentUseCase(localConsentStore: LocalConsentStore): GetConsentUseCase {
+        return GetConsentUseCase(localConsentStore)
     }
 
 
