@@ -52,3 +52,9 @@ Use this token in all other requests as:
 ```http
 Authorization: Bearer your_token_here
 ```
+
+## Automatic testing of granting consent flow
+To run automatic tests for granting consent flow please run `test_consent_flow.sh`. 
+This might be useful when:
+- you modify the backend mock
+- mobile development is having issues with backend mock
